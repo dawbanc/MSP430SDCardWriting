@@ -8,5 +8,5 @@
  The SD card can then be inserted into a Windows (or Linux) machine. Then a configuration file can be created to read the SD card values into a CSV file. You can even do math between several cells and have configuration data in the first block on the SD card.
  
  # Action Items
- [ ] Add an installer for the GUI
- [ ] Get a pure Windows SD Card reading process
+- [ ] Add an installer for the GUI
+- [ ] Get a pure Windows SD Card reading process
