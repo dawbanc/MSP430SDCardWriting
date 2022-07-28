@@ -63,9 +63,9 @@ def confirmAttachmentSelection():
 
 def confirmNumDataPoints():
     global num_data_pts
-    resetStatus()
-    numDataPoints = entry_numDataPoints.get()
-    label_numDataPoints.configure(text="Number Data Points: " + str(numDataPoints))
+    resetStatus()                               #changed 6/19/2022 by @dawsonxbancroft to fix -1 in data
+    num_data_pts = int(entry_numDataPoints.get())
+    label_numDataPoints.configure(text="Number Data Points: " + str(num_data_pts))
 
 
 def read_config_file(file_path):
@@ -533,6 +533,8 @@ def startConversion():
         config_file_path = "config\\NEMOconfig_old.txt"
     elif type_of_data == "LANL NEMO Device":
         config_file_path = 'config\\NEMOconfig.txt'
+    elif type_of_data == "BakTrack Data":
+        config_file_path = 'config\\bakTrackConfig.txt'
     config = cwd + "\\" + config_file_path
     if not os.path.isfile(config):
         print("Fatal Error 0x10: No config file found, please ensure config directory is upto date")
@@ -595,7 +597,8 @@ button_explore_output = tk.Button(window,
 OPTIONS_ATTACH = [
     "No Attachments",
     "LANL NEMO Device (old)",
-    "LANL NEMO Device"
+    "LANL NEMO Device",
+    "BakTrack Data"
 ]
 # add other[beta] at some point using a text file to direct formatting
 # also add IR attachement after config is written and tested
