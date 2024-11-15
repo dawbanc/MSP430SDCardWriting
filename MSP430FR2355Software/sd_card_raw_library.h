@@ -11,15 +11,41 @@ extern unsigned int address_error;
 // IF USING DIFFERENT PINS OR A DIFFERENT MICROCONTROLLER CHANGE THE NEXT 6 LINES
 #include <msp430.h>
 
-#define SPI_PORT_DIR                    P3DIR
-#define SPI_PORT_OUT                    P3OUT
-#define SPI_PORT_IN                     P3IN
-#define SPI_PORT_REN                    P3REN
-#define SPI_STE                         BIT0
+// CLOCK
+#define SPI_CLK_PORT_DIR                P3DIR
+#define SPI_CLK_PORT_OUT                P3OUT
+#define SPI_CLK_PORT_IN                 P3IN
+#define SPI_CLK_PORT_REN                P3REN
 #define SPI_CLK                         BIT3
+
+// CHIP SELECT
+#define SPI_SEL_PORT_DIR                P3DIR
+#define SPI_SEL_PORT_OUT                P3OUT
+#define SPI_SEL_PORT_IN                 P3IN
+#define SPI_SEL_PORT_REN                P3REN
+#define SPI_SEL                         BIT0
+
+// MOSI
+#define SPI_MOSI_PORT_DIR               P3DIR
+#define SPI_MOSI_PORT_OUT               P3OUT
+#define SPI_MOSI_PORT_IN                P3IN
+#define SPI_MOSI_PORT_REN               P3REN
 #define SPI_MOSI                        BIT1
+
+// MISO
+#define SPI_MISO_PORT_DIR               P3DIR
+#define SPI_MISO_PORT_OUT               P3OUT
+#define SPI_MISO_PORT_IN                P3IN
+#define SPI_MISO_PORT_REN               P3REN
 #define SPI_MISO                        BIT2
-#define SPI_CARD_DETECT                 BIT0
+
+// CARD DETECT
+#define SPI_CD_PORT_DIR                 P3DIR
+#define SPI_CD_PORT_OUT                 P3OUT
+#define SPI_CD_PORT_IN                  P3IN
+#define SPI_CD_PORT_REN                 P3REN
+#define SPI_CD                          BIT0
+
 // ANYTHING AFTER THIS SHOULD BE FINE
 
 // FUNCTION DEFS

@@ -1,10 +1,6 @@
 #include <msp430.h> 
 #include <sd_card_raw_library.h>
 
-// Globals
-unsigned long address_cnt = 0x00; // CNT for address of microSD       //temp to test values
-
-
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
@@ -13,6 +9,8 @@ int main(void)
     SPIInit();                                          // Initialize SPI Ports
 
     PM5CTL0 &= ~LOCKLPM5;
+
+    unsigned long address_cnt = 0x00; // CNT for address of microSD // if you don't want to overwrite data in power loss situation, store this as a global
 
     // for SD Card
     sdCardInit();                                       // Send Initialization Commands to SD Card
