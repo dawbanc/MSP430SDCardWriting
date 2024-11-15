@@ -15,30 +15,30 @@ char sendByteSPI(char data)
 {
     int i;
     int moreThanOne = 1;
-    if(SPI_PORT_OUT & SPI_STE != 0)             // Ensure STE is Down
+    if(SPI_SEL_PORT_OUT & SPI_SEL != 0)             // Ensure STE is Down
     {
-        SPI_PORT_OUT &= ~SPI_STE;
+        SPI_SEL_PORT_OUT &= ~SPI_SEL;
         moreThanOne = 0;
     }
     for(i = 8; i > 0; i--)
     {
         if(data & 0x80)                         // Send Data Out for Slave
-            SPI_PORT_OUT |= SPI_MOSI;
+            SPI_MOSI_PORT_OUT |= SPI_MOSI;
         else
-            SPI_PORT_OUT &= ~SPI_MOSI;
+            SPI_MOSI_PORT_OUT &= ~SPI_MOSI;
         data = data << 1;
 
-        SPI_PORT_OUT &= ~SPI_CLK;               // Cycle Clock
-        SPI_PORT_OUT |= SPI_CLK;
+        SPI_CLK_PORT_OUT &= ~SPI_CLK;               // Cycle Clock
+        SPI_CLK_PORT_OUT |= SPI_CLK;
 
-        if(SPI_PORT_IN & SPI_MISO)              // Read Data from Slave
+        if(SPI_MISO_PORT_IN & SPI_MISO)              // Read Data from Slave
             data |= BIT0;
         else
             data &= ~BIT0;
     }
     if(moreThanOne == 0)
     {
-        SPI_PORT_OUT |= SPI_STE;
+        SPI_SEL_PORT_OUT |= SPI_SEL;
     }
     return data;
 }
@@ -46,7 +46,9 @@ char sendByteSPI(char data)
 // Stop SPI to Ensure Correct Protocol
 void stopSPI(void)
 {
-    SPI_PORT_OUT |= SPI_STE | SPI_CLK | SPI_MOSI;
+    SPI_SEL_PORT_OUT |= SPI_SEL;
+    SPI_CLK_PORT_OUT |= SPI_CLK;
+    SPI_MOSI_PORT_OUT |= SPI_MOSI;
 }
 
 // Clock Pulse Function to Set Slave Clock Speed
@@ -58,17 +60,17 @@ void pulseClock(int num)
         for(i = 8; i > 0; i--)
         {
             int data = 0x00, dummy = 0x00;
-            SPI_PORT_OUT |= SPI_STE;
+            SPI_SEL_PORT_OUT |= SPI_SEL;
             if(data & 0x80)
                 dummy |= BIT0;
             else
                 dummy &= ~BIT0;
             data = data << 1;
 
-            SPI_PORT_OUT &= ~SPI_CLK;               // Cycle Clock
-            SPI_PORT_OUT |= SPI_CLK;
+            SPI_CLK_PORT_OUT &= ~SPI_CLK;               // Cycle Clock
+            SPI_CLK_PORT_OUT |= SPI_CLK;
 
-            if(SPI_PORT_IN & SPI_MISO)              // Read Data from Slave
+            if(SPI_MISO_PORT_IN & SPI_MISO)              // Read Data from Slave
                 data |= BIT0;
             else
                 data &= ~BIT0;
@@ -82,9 +84,9 @@ void sendDataSPI(unsigned char* buffer, unsigned int size)
 {
     int i;
     int moreThanOne = 1;
-    if(SPI_PORT_OUT & SPI_STE != 0)
+    if(SPI_SEL_PORT_OUT & SPI_SEL != 0)
     {
-        SPI_PORT_OUT &= ~SPI_STE;                   // Ensure STE is Down
+        SPI_SEL_PORT_OUT &= ~SPI_SEL;                   // Ensure STE is Down
         moreThanOne = 0;
     }
     for(i = 0; i < size; i++)
@@ -93,7 +95,7 @@ void sendDataSPI(unsigned char* buffer, unsigned int size)
     }
     if(moreThanOne == 0)
     {
-        SPI_PORT_OUT |= SPI_STE;
+        SPI_SEL_PORT_OUT |= SPI_SEL;
     }
 }
 
@@ -110,7 +112,7 @@ void sendCommandWithoutPullingCSHigh(char cmd, long data, char crc)
         frame[4 - i] = (temp);
     }
     frame[5] = (crc);
-    SPI_PORT_OUT &= ~SPI_STE;
+    SPI_SEL_PORT_OUT &= ~SPI_SEL;
     sendDataSPI(frame, 6);
 }
 
@@ -127,7 +129,7 @@ void sendCommand(char cmd, long data, char crc, unsigned char* received)
         frame[4 - i] = (temp);
     }
     frame[5] = (crc);
-    SPI_PORT_OUT &= ~SPI_STE;
+    SPI_SEL_PORT_OUT &= ~SPI_SEL;
     sendDataSPI(frame, 6);
     int cnt = 0;
     while(!(cnt >= 5))
@@ -135,15 +137,23 @@ void sendCommand(char cmd, long data, char crc, unsigned char* received)
         received[cnt] = sendByteSPI(0xFF);
         cnt++;
     }
-    SPI_PORT_OUT |= SPI_STE;
+    SPI_SEL_PORT_OUT |= SPI_SEL;
 }
 
 // SPI Ports Initialization
 void SPIInit(void)
 {
-    SPI_PORT_DIR = SPI_STE | SPI_CLK | SPI_MOSI;
-    SPI_PORT_OUT = SPI_STE | SPI_CLK | SPI_MOSI | SPI_MISO;
-    SPI_PORT_REN = SPI_MISO;
+    //SPI_PORT_DIR = SPI_SEL | SPI_CLK | SPI_MOSI;
+    SPI_SEL_PORT_DIR |= SPI_SEL;
+    SPI_CLK_PORT_DIR |= SPI_CLK;
+    SPI_MOSI_PORT_DIR |= SPI_MOSI;
+    //SPI_PORT_OUT = SPI_SEL | SPI_CLK | SPI_MOSI | SPI_MISO;
+    SPI_SEL_PORT_OUT |= SPI_SEL;
+    SPI_CLK_PORT_OUT |= SPI_CLK;
+    SPI_MOSI_PORT_OUT |= SPI_MOSI;
+    SPI_MISO_PORT_OUT |= SPI_MISO;
+    //SPI_PORT_REN = SPI_MISO;
+    SPI_MISO_PORT_REN |= SPI_MISO;
 }
 
 // SD Card Initialization Sequence
@@ -196,7 +206,7 @@ void sendData(unsigned long address, unsigned char* data)
     {
         sendByteSPI(sdCardPacket[i]);
     }
-    SPI_PORT_OUT |= SPI_STE;
+    SPI_SEL_PORT_OUT |= SPI_SEL;
     unsigned char dataIn[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};     // Ensure Card Isn't Busy Before Continuing
     sendCommand(0x4D, 0, 0, dataIn);
     sendCommand(0x4D, 0, 0, dataIn);
@@ -207,7 +217,7 @@ void sendData(unsigned long address, unsigned char* data)
         sendCommand(0x4D, 0, 0, dataIn);
     }
     sendCommand(0x4D, 0, 0, dataIn);
-    SPI_PORT_OUT |= SPI_STE;
+    SPI_SEL_PORT_OUT |= SPI_SEL;
 }
 
 void receiveData(unsigned long address, unsigned char* data)
@@ -221,8 +231,8 @@ void receiveData(unsigned long address, unsigned char* data)
         in = sendByteSPI(0xFF);
     }
     if(in != 0x01) return;
-    SPI_PORT_OUT &= ~SPI_CLK;
-    SPI_PORT_OUT |= SPI_CLK;
+    SPI_CLK_PORT_OUT &= ~SPI_CLK;
+    SPI_CLK_PORT_OUT |= SPI_CLK;
     while(in != 0xFC)
     {
         in = sendByteSPI(0xFF);
@@ -233,5 +243,5 @@ void receiveData(unsigned long address, unsigned char* data)
     }
     sendByteSPI(0xFF);
     sendByteSPI(0xFF);
-    SPI_PORT_OUT |= SPI_STE;
+    SPI_SEL_PORT_OUT |= SPI_SEL;
 }
